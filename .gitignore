@@ -5,3 +5,4 @@ UserSettings/
 UpgradeLog.htm
 obj/
 .vs/
+.build/

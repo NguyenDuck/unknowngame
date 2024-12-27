@@ -1,19 +1,30 @@
+using TMPro;
 using UnityEngine;
 
 
 public class Movement : MonoBehaviour
 {
-    public float speed = 0.1f;
-    public readonly float speedMultiplier = 10f;
-    public float jumpForce = 1f;
+    public float speed = 4.317f;
+    public float speedMultiplier = 30f;
+    public float jumpForce = 1.2522f;
     private Rigidbody body;
     public Transform cam;
+    private Collision collision;
+    public Bounds contactBounds;
+    public GameObject positionText;
+    private TextMeshProUGUI textMesh;
+
+    public float x1 = 0f;
+    public float z1 = 0f;
+    public float x2 = 0f;
+    public float z2 = 0f;
 
     private bool isGrounded;
 
     void Start()
     {
         body = GetComponent<Rigidbody>();
+        textMesh = positionText.GetComponent<TextMeshProUGUI>();
     }
 
     void Update()
@@ -21,10 +32,19 @@ public class Movement : MonoBehaviour
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKey(KeyCode.Space) && isGrounded)
         {
-            body.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            body.MovePosition(body.position + new Vector3(0, jumpForce, 0));
             isGrounded = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftControl) && isGrounded)
+        {
+            speedMultiplier *= 1.3f;
+        }
+        else
+        {
+            speedMultiplier = 30f;
         }
 
         Vector3 direction = new Vector3(moveHorizontal, 0f, moveVertical).normalized;
@@ -33,13 +53,19 @@ public class Movement : MonoBehaviour
         {
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            body.MovePosition(speedMultiplier * Time.deltaTime * speed * moveDir.normalized + body.position);
+            Vector3 newRelativePosition = speedMultiplier * Time.deltaTime * speed * moveDir.normalized;
+
+            body.MovePosition(newRelativePosition + body.position);
         }
+
+        textMesh.text = body.position.ToString();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        this.collision = collision;
+
+        if (collision.collider != null)
         {
             isGrounded = true;
         }
