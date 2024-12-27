@@ -21,11 +21,10 @@ public class CameraController : MonoBehaviour
         xRotation -= mouseY;
         yRotation += mouseX;
 
-
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         transform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
 
-        transform.position = player.transform.position;
+        transform.position = player.transform.position + new Vector3(0, 1.6f / 2, 0);
     }
 }
